@@ -1,3 +1,1 @@
-# node-js-project
-• Sign up, Sign in, Authorization
-• Create, edit and delete posts
+Create a user account and store it in the database where his email is stored with the encrypted password, then he can log in and create his own posts with them stored in the database and edit or delete them and he can view the posts of other users without being able to edit them, and logging out is available.
