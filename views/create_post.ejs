@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post</title>
+</head>
+<body>
+    <form action="/posts/<%= user._id %>" method="post">
+        <textarea name="new_post" id="" required></textarea>
+        <button type="submit">Create post</button>
+    </form>
+
+    <% if (posts.length > 0) { %>
+        <% posts.forEach(post => { %>
+            <br>
+            <span id="post-<%= post._id %>"><%= post.new_post %></span>
+            <button class="put" data-doc="<%= post._id %>">Edit</button>
+            <button class="delete" data-doc="<%= post._id %>">Delete</button>
+            <br>
+        <% }) %>
+    <% } %>
+</body>
+<script>
+    document.querySelectorAll('button.delete').forEach(button => {
+        button.addEventListener('click', e => {
+            e.preventDefault();
+            const userId = '<%= user._id %>';
+            fetch(`/posts/${button.dataset.doc}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => window.location.href = data.redirect)
+            .catch(error => console.log(error));
+        });
+    });
+
+    document.querySelectorAll('button.put').forEach(button => {
+        button.addEventListener('click', e => {
+            const postId = button.dataset.doc;
+            let mySpan = document.getElementById(`post-${postId}`);
+            console.log(mySpan)
+
+            if (button.textContent === 'Edit') {
+                button.textContent = 'Save';
+                
+                let textArea = document.createElement('textarea')
+                textArea.id = `textarea-${postId}`
+                textArea.value = mySpan.textContent;
+
+                mySpan.parentNode.replaceChild(textArea, mySpan);
+
+                textArea.addEventListener('input', (e)=>{
+                    textArea.value = e.target.value
+                })
+
+            } else if (button.textContent === 'Save') {
+                button.textContent = 'Edit';
+                let textArea = document.getElementById(`textarea-${postId}`)
+            
+                let newSpan = document.createElement('span')
+                newSpan.id = `post-${postId}`
+                newSpan.textContent = textArea.value;
+                textArea.parentNode.replaceChild(newSpan, textArea);
+
+                e.preventDefault();
+                const userId = '<%= user._id %>';
+                fetch(`/posts/${postId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        new_post: newSpan.textContent
+                    })
+                })
+                .then(response => response.json())
+                .then(data => window.location.href = data.redirect)
+                .catch(error => console.log(error));
+            }
+        });
+    });
+</script>
+</html>

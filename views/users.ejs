@@ -1,0 +1,33 @@
+<html lang="en">
+
+<body>
+       <h1 style="color: red">Welcome <%= user1.fullName %></h1>
+       <button class="put" data-doc="<%= user1._id %>">log out</button>
+        <% if(users.length > 0){ %>
+            <% users.forEach(user=>{ %>
+                <a href="/posts/<%= user._id %>">
+                    <h1><%= user.fullName %></h1>
+                    <small><%= user.email %></small>
+                </a>
+            <% }) %>
+        <% } %>
+        
+        <script>
+            let but = document.querySelector('button')
+            but.addEventListener('click',(e)=>{
+                e.preventDefault()
+                const userId = '<%= user1._id %>'
+                fetch(`homepage`,{
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify({user_id: userId})
+                })
+                .then(responce => responce.json())
+                .then(data => window.location.href = data.redirect)
+                .catch(error => console.log(error));
+            })
+        </script>
+</body>
+</html>
